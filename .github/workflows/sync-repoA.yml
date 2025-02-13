@@ -1,0 +1,12 @@
+name: Sync RepoA Changes
+
+on:
+  repository_dispatch:
+    types: [new-update]
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Hello World
+        run: echo "Hello, World!"

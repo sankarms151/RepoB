@@ -40,4 +40,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print Hello World
+<<<<<<< HEAD
         run: echo "Hello World!"
+=======
+        run: echo "Hello World!"
+>>>>>>> addab825564e2e0925e5f6c3466db1a833183ead

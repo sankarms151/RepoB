@@ -5,7 +5,38 @@ on:
     types: [new-update]
 
 jobs:
+  validate-token:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify OAuth Token and Trigger Source
+        env:
+          EXPECTED_REPO: sankarms151/RepoA
+          RECEIVED_REPO: ${{ github.event.client_payload.trigger_repo }}
+          RECEIVED_TOKEN: ${{ github.event.client_payload.auth_token }}
+        run: |
+          echo "Received event from: $RECEIVED_REPO"
+
+          # Validate the trigger source
+          if [[ "$RECEIVED_REPO" != "$EXPECTED_REPO" ]]; then
+            echo "Unauthorized trigger: $RECEIVED_REPO"
+            exit 1
+          fi
+          echo "Trigger source is valid!"
+
+          # Validate the token's access to the repository
+          RESPONSE=$(curl -H "Authorization: Bearer $RECEIVED_TOKEN" \
+                          -H "Accept: application/vnd.github.v3+json" \
+                          https://api.github.com/repos/$EXPECTED_REPO)
+
+          if echo "$RESPONSE" | grep -q '"full_name": "'$EXPECTED_REPO'"'; then
+            echo "Token has access to RepoA"
+          else
+            echo "Token does NOT have access to RepoA!"
+            exit 1
+          fi
+
   say-hello:
+    needs: validate-token
     runs-on: ubuntu-latest
     steps:
       - name: Print Hello World
